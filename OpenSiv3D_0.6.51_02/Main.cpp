@@ -36,7 +36,7 @@ void Main()
 		Forward.normalize();
 		Vec3 Right = Vec3(Forward.z, 0.0, -Forward.x);
 
-		//Cursor::DeltaF();
+		//Cursor::DeltaF();aa
 
 
 		if (KeyW.pressed())

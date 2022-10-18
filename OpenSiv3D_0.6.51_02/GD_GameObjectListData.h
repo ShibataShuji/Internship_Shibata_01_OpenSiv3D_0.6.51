@@ -5,16 +5,26 @@
 struct GD_GameObjectListData
 {
 	Array<GameObject*> GameObjectList;
-
+	int				   UpdateObjectNum;
 
 	void UpdateGameObjectList()
 	{
 		if (!GameObjectList.empty())
 		{
-			for (auto GameObject : GameObjectList)
+			// 途中でゲームオブジェクトの数が変わる可能性があるのでautoで範囲forするのはダメみたい。
+			UpdateObjectNum = GameObjectList.size();
+			for (int i = 0; i < UpdateObjectNum; i++)
 			{
+				auto& GameObject = GameObjectList[i];
 				GameObject->Update();
 			}
+			/*for (auto& GameObject : GameObjectList)
+			{
+				auto GameObject = GameObjectList[0]
+				String aaa = GameObject->GetName();
+				GameObject->Update();
+				count++;
+			}*/
 		}
 	}
 
@@ -36,6 +46,7 @@ struct GD_GameObjectListData
 		gameObject->Init();
 		GameObjectList.push_back(gameObject);
 
+		UpdateObjectNum++;
 		return gameObject;		// 生成したインスタンスのポインタが入っている
 	}
 

@@ -14,9 +14,9 @@ const static int UpdatePriority_Max = 3;	// コンポーネントのアップデ
 
 class GameObject;
 
-// CComponentのUpdateとかはgameObjectのUpdateとかで呼んでいる
+// ComponentのUpdateとかはgameObjectのUpdateとかで呼んでいる
 
-class CComponent
+class Component
 {
 protected:
 	GameObject* m_ParentGameObject;		// 親になっているゲームオブジェクト
@@ -25,23 +25,25 @@ protected:
 
 	int			m_UpdatePriority = 0;	// Updateの優先度。0から最初に実行されていき最も遅くて3(今のとこ)
 
+	bool		m_FirstRead = false;	// 初めてアップデートで読み込まれたかどうか。
+
 public:
 
 	// コンストラクタ。既定の引き数なしコンストラクタは、絶対に親のオブジェクトを設定しないとダメにするために消している。
-	CComponent() = delete;
-	CComponent(GameObject* gameObject)
+	Component() = delete;
+	Component(GameObject* gameObject)
 	{
 		m_ParentGameObject = gameObject;
 	}
 	// デストラクタ
-	virtual ~CComponent() {}
+	virtual ~Component() {}
 
-	virtual void Init() {}			// 仮想関数virtualをつけると同じCComponent.Init()を呼んでもoverrideした方の関数が呼ばれる
+	virtual void Init() {}			// 仮想関数virtualをつけると同じComponent.Init()を呼んでもoverrideした方の関数が呼ばれる
 	virtual void Uninit() { delete this; }		// だからvirtualをつけて、overrideした関数の方で親の関数も呼ぶようにすれば親も自分も呼ばれてOK
-	virtual void Update() {}
+	virtual void Update() { m_FirstRead = true; }
 	virtual void Draw() {}
 
-	virtual void CopyThisComponent(CComponent* fromComponent) {};	// コピーコンストラクタのようなもの
+	virtual void CopyThisComponent(Component* fromComponent) {};	// コピーコンストラクタのようなもの
 
 	virtual void Save(std::ofstream* Objfile, std::ofstream* ObjfileB) {}			// オーバーライドする
 	virtual void Load(std::ifstream* Objfile) {}			// オーバーライドする

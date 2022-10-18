@@ -4,7 +4,7 @@
 void Main()
 {
 	Window::Resize(1280, 720);
-	Window::SetFullscreen(true);
+	//Window::SetFullscreen(true);
 
 
 
@@ -20,12 +20,13 @@ void Main()
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
 
+	// ゲームデータにどこからでもアクセスできるように
 	ManagerManager::SetGameData(manager.get().get());
 
 	
 
 	// ゲームシーンから開始したい場合はこのコメントを外す
-	//manager.init(State::Game);
+	manager.init(State::Game);
 
 	while (System::Update())
 	{

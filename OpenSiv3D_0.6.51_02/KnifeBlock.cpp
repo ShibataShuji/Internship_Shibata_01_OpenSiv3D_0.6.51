@@ -3,7 +3,24 @@
 
 void KnifeBlock::Init()
 {
-	
+	// このオブジェクトの名前
+	m_Name = U"KnifeBlock";
+
+	/*auto col = AddComponent<Collision_Box>();
+	col->SetResponseObject(ResponseObject::BlocksPawn);
+	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
+	col->SetOffsetSize(Vec3(5, 5, 5));*/
+
+	auto col = AddComponent<Collision_Sphere>();
+	col->SetResponseObject(ResponseObject::ItemsPawn);
+	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
+	col->SetOffsetSize(5.0f);
 }
 
 
@@ -19,29 +36,6 @@ void KnifeBlock::Update()
 
 	AddPosition(GetVelocity());
 
-	OrientedBox box = OrientedBox{ GetPosition(), m_Size, GetQuaternion() }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-
-
-
-	//}
-	Array<GameObject*> GameObjectList = ManagerManager::GetGameData()->GameObjectListData.GetGameObjectList();
-	for (auto gameobject : GameObjectList)
-	{
-		if (gameobject == this)
-			continue;
-
-		OrientedBox other = OrientedBox{ gameobject->GetPosition(), gameobject->m_Size, gameobject->GetQuaternion()};
-
-		bool hit = box.intersects(other);
-
-		if (hit)
-		{
-			SetVelocity(Vec3(0, 0, 0));
-			break;
-		}
-
-	}
-
 	GameObject::ComponentUpdate();		// 最後に持ってくる
 }
 
@@ -49,15 +43,5 @@ void KnifeBlock::Update()
 void KnifeBlock::Draw()
 {
 	GameObject::Draw();	// 最初に持ってくる
-
-	// テスト用
-	//Box{ -8,2,0,4 }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-	//OrientedBox{ Vec3{0, 2, 0}, 4, Quaternion::RotateY(1.5 * 30_deg) }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-
-
-	OrientedBox box = OrientedBox{ GetPosition(), m_Size, GetQuaternion() }.draw(Linear::Palette::Aqua);
-
-
-
 
 }

@@ -3,6 +3,20 @@
 
 void Blocks::Init()
 {
+	// このオブジェクトの名前
+	m_Name = U"Blocks";
+
+	auto col = AddComponent<Collision_Box>();
+	col->SetResponseObject(ResponseObject::BlocksPawn);
+	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
+	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Block);
+	col->SetOffsetSize(Vec3(5, 5, 5));
+	// テスト用にItemにしてオーバーラップするところ見せてるよ。後で消してね
+	col->SetResponseObject(ResponseObject::ItemsPawn);
+	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
+
 
 }
 
@@ -17,9 +31,6 @@ void Blocks::Update()
 {
 	GameObject::Update();		// 最初に持ってくる
 
-	// テスト用
-	OrientedBox box = OrientedBox{ GetPosition(), m_Size, GetQuaternion() }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-
 	GameObject::ComponentUpdate();		// 最後に持ってくる
 }
 
@@ -27,13 +38,4 @@ void Blocks::Update()
 void Blocks::Draw()
 {
 	GameObject::Draw();	// 最初に持ってくる
-
-	// テスト用
-	//Box{ -8,2,0,4 }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-	OrientedBox box = OrientedBox{ GetPosition(), m_Size, GetQuaternion() }.draw(ColorF{ 0.8, 0.6, 0.4 }.removeSRGBCurve());
-
-
-
-
-
 }

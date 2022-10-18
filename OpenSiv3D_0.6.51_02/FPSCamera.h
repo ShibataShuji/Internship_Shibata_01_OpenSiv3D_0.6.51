@@ -69,4 +69,19 @@ struct FPSCamera
 		return (eyePosition + GetDirection());
 	}
 
+	Vec3 GetForward()
+	{
+		Vec3 dir = GetDirection();
+		dir.y = 0.0;
+		dir.normalize();
+		return dir;
+	}
+
+	Vec3 GetRight()
+	{
+		Vec3 forward = GetForward();
+		Vec3 right = Vec3(forward.z, 0.0, -forward.x);
+		return right;
+	}
+
 };

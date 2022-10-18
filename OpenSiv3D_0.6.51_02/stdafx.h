@@ -9,11 +9,19 @@
 // 他の干渉がないデータ系
 #include"FPSCamera.h"
 
-// ゲームオブジェクトの元
+// コンポーネント系
 #include "Component.h"
+#include "Collision.h"
+
+#include "Collision_Sphere.h"
+#include "Collision_Box.h"
+
+// ゲームオブジェクトの元
 #include "GameObject.h"
 
+
 // ゲームオブジェクト系
+#include "Player.h"
 #include "KnifeBlock.h"	// プレイヤーが発射する特殊なブロック
 
 #include "Blocks.h"

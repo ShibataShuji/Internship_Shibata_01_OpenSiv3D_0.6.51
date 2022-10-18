@@ -9,29 +9,28 @@ protected:	// アクセス指定子
 
 	Vec3				m_Position = Vec3(0.0f, 0.0f, 0.0f);
 	Vec3				m_Rotation = Vec3(0.0f, 0.0f, 0.0f);
-	Quaternion			m_Quaternion = Quaternion::Identity();
+	//Quaternion			m_Quaternion = Quaternion::Identity();	// 管理はRotでやって表示などはクォータニオンでやる
 	//Vec3				m_Scale = Vec3(1.0f, 1.0f, 1.0f);
 	Vec3				m_ScaleRate = Vec3(1.0f, 1.0f, 1.0f);
 
 	Vec3				m_Delta_Position = Vec3(0.0f, 0.0f, 0.0f);
 	Vec3				m_Velocity = Vec3(0.0f, 0.0f, 0.0f);
 
+	String				m_Name = U"noname";
 
-	Array<CComponent*>	m_ComponentList;
+
+	Array<Component*>	m_ComponentList;
 	Array<String>		m_ComponentNameList;
 	Array<GameObject*>	m_Child;
 
 
-	// Collisionコンポーネントを1つでも持っているときに使うよう変数
+	// Collisionコンポーネントを1つでも持っているときに使うよう変数。本当はコリジョンがついてたらもつってしたい。
 	Array<GameObject*>	m_Collision_HitObjectList;
 	Array<Vec3>			m_Collision_HitPositionList;
 	Array<GameObject*>	m_Collision_OverlapObjectList;
-	Array<Vec3>			m_Collision_OverlapPositionList;
+	//Array<Vec3>			m_Collision_OverlapPositionList;
 
 public:
-
-	// 本当はモデルとコリジョンコンポーネントでやるけどテスト用
-	Vec3 m_Size;
 
 	GameObject() {}
 
@@ -87,7 +86,7 @@ public:
 
 	virtual void Draw()
 	{
-		for (auto c : m_ComponentList)
+		for (const auto& c : m_ComponentList)
 			c->Draw();
 	}
 
@@ -100,7 +99,7 @@ public:
 
 		for (int i = 0; i < UpdatePriority_Max; i++)
 		{
-			for (auto comp : m_ComponentList)
+			for (const auto& comp : m_ComponentList)
 			{
 				if (comp->GetComponentUpdatePriority() == i)
 					comp->Update();
@@ -114,36 +113,46 @@ public:
 		m_Collision_HitObjectList.clear();
 		m_Collision_HitPositionList.clear();
 		m_Collision_OverlapObjectList.clear();
-		m_Collision_OverlapPositionList.clear();
+		//m_Collision_OverlapPositionList.clear();
 	}
 
+	String GetName() { return m_Name; }
+	void SetName(const String& name) { m_Name = name; }
 
-
-	void AddPosition(Vec3 AddPosition) { m_Position += AddPosition; }
-	void SetPosition(Vec3 Position) { m_Position = Position; }
-	void SetPosition_x(float x) { m_Position.x = x; }
-	void SetPosition_y(float y) { m_Position.y = y; }
-	void SetPosition_z(float z) { m_Position.z = z; }
+	void AddPosition(const Vec3& AddPosition) { m_Position += AddPosition; }
+	void SetPosition(const Vec3& position) { m_Position = position; }
+	void SetPosition_x(const float& x) { m_Position.x = x; }
+	void SetPosition_y(const float& y) { m_Position.y = y; }
+	void SetPosition_z(const float& z) { m_Position.z = z; }
 	Vec3 GetPosition() { return m_Position; }
+	void AddPosition_y(const float& y) { m_Position.y += y; }
+
 
 	Vec3 GetDelataPosition() { return m_Delta_Position; }
 
-	void SetRotation(Vec3 rotation) { m_Rotation = rotation; }
+	void SetRotation(const Vec3& rotation) { m_Rotation = rotation; }
 	Vec3 GetRotation() { return m_Rotation; }
 
-	void SetQuaternion(Quaternion quaternion) { m_Quaternion = quaternion; }
-	Quaternion GetQuaternion() { return m_Quaternion; }
+	//void SetQuaternion(const Quaternion& quaternion) { m_Quaternion = quaternion; }
+	Quaternion GetQuaternion()
+	{
+		Quaternion Qua = Quaternion::Identity();	// 演算用に基本形のクォータニオンをを作成
+
+		return Qua.RollPitchYaw<double, double, double>(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+	}
 
 	/*void SetScale(Vec3 scale) { m_Scale = scale; }
 	Vec3 GetScale() { return m_Scale; }*/
-	void SetScaleRate(Vec3 setscalerate) { m_ScaleRate = setscalerate; }
+	void SetScaleRate(const Vec3& SetScaleRate) { m_ScaleRate = SetScaleRate; }
 	Vec3 GetScaleRate() { return m_ScaleRate; }
 
 	Vec3 GetVelocity() { return m_Velocity; }
-	void SetVelocity(Vec3 Velocity) { m_Velocity = Velocity; }
-	void SetVelocity_x(float x) { m_Velocity.x = x; }
-	void SetVelocity_y(float y) { m_Velocity.y = y; }
-	void SetVelocity_z(float z) { m_Velocity.z = z; }
+	void SetVelocity(const Vec3& Velocity) { m_Velocity = Velocity; }
+	void SetVelocity_x(const float& x) { m_Velocity.x = x; }
+	void SetVelocity_y(const float& y) { m_Velocity.y = y; }
+	void SetVelocity_z(const float& z) { m_Velocity.z = z; }
+	void AddVelocity(const Vec3& Velocity) { m_Velocity += Velocity; }
+	void AddVelocity_y(const float& y) { m_Velocity.y += y; }
 
 
 
@@ -202,13 +211,13 @@ public:
 		T* ccomponent = new T(this);
 		ccomponent->Init();
 		m_ComponentList.push_back(ccomponent);
-		m_ComponentNameList.push_back("noname");
+		m_ComponentNameList.push_back(U"noname");
 
 		return ccomponent;
 	}
 	// 名前つけるバージョン
 	template <typename T>
-	T* AddComponent(String name)
+	T* AddComponent(const String& name)
 	{
 		T* ccomponent = new T(this);
 		ccomponent->Init();
@@ -221,10 +230,10 @@ public:
 	// このゲームオブジェクトの中に引き数の名前をつけているコンポーネントがあればそのコンポーネントを返す
 	// あってはならないが複数あったらリストの最初のものが返る
 	template <typename T>
-	T* GetComponentWithName(String name)
+	T* GetComponentWithName(const String& name)
 	{
 		int itrCount = 0;
-		for (auto cName : m_ComponentNameList)
+		for (const auto& cName : m_ComponentNameList)
 		{
 			// 文字列が同じものがあったら
 			if (name == cName)
@@ -242,7 +251,7 @@ public:
 		return nullptr;
 	}
 
-	Array<CComponent*> GetComponentList()
+	Array<Component*> GetComponentList()
 	{
 		return m_ComponentList;
 	}
@@ -250,7 +259,7 @@ public:
 	template <typename T>
 	bool HasComponent()
 	{
-		for (auto c : m_ComponentList)
+		for (const auto& c : m_ComponentList)
 		{
 			if (typeid(*c) == typeid(T))
 			{
@@ -263,21 +272,21 @@ public:
 	int GetComponentNum()
 	{
 		int count = 0;
-		for (auto Comp : m_ComponentList)
+		for (const auto& Comp : m_ComponentList)
 		{
 			count++;
 		}
 		return count;
 	}
 
-	void DestroyComponent(int compCount)
+	void DestroyComponent(const int& compCount)
 	{
 
 
-		CComponent* temp = nullptr;
+		Component* temp = nullptr;
 
 		int count = 0;
-		for (auto Comp : m_ComponentList)
+		for (const auto& Comp : m_ComponentList)
 		{
 			if (count == compCount)
 			{
@@ -300,12 +309,12 @@ public:
 	void DestroyComponentList()
 	{
 
-		Array<CComponent*> templist;
+		Array<Component*> templist;
 		templist = m_ComponentList;
 
 		m_ComponentList.clear();
 
-		for (auto tempc : templist)
+		for (const auto& tempc : templist)
 		{
 			tempc->Uninit();
 		}
@@ -319,15 +328,15 @@ public:
 
 
 	// Collision用
-	void Collision_AddHitObject(GameObject* hitobject, Vec3 hitpos)
+	void Collision_AddHitObject(GameObject* hitobject, const Vec3& hitpos)
 	{
 		m_Collision_HitObjectList.push_back(hitobject);
 		m_Collision_HitPositionList.push_back(hitpos);
 	}
-	void Collision_AddOverlapObject(GameObject* overlapobject, Vec3 overlappos)
+	void Collision_AddOverlapObject(GameObject* overlapobject)//, const Vec3& overlappos)
 	{
 		m_Collision_OverlapObjectList.push_back(overlapobject);
-		m_Collision_OverlapPositionList.push_back(overlappos);
+		//m_Collision_OverlapPositionList.push_back(overlappos);
 	}
 
 

@@ -13,6 +13,8 @@
 #include "Component.h"
 #include "Collision.h"
 
+//#include "Collision_Sub.h"	// Collisionで計算に使う関数を書いている
+
 #include "Collision_Sphere.h"
 #include "Collision_Box.h"
 

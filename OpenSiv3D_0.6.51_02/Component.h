@@ -48,6 +48,8 @@ public:
 	virtual void Save(std::ofstream* Objfile, std::ofstream* ObjfileB) {}			// オーバーライドする
 	virtual void Load(std::ifstream* Objfile) {}			// オーバーライドする
 
+
+
 	String GetComponentName()
 	{
 		return m_CompName;
@@ -61,6 +63,11 @@ public:
 	int GetComponentUpdatePriority()
 	{
 		return m_UpdatePriority;
+	}
+
+	GameObject* GetParentGameObject()
+	{
+		return m_ParentGameObject;
 	}
 
 };

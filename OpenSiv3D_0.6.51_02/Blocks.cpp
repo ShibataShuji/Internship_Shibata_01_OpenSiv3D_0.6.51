@@ -13,9 +13,9 @@ void Blocks::Init()
 	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
 	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Block);
 	col->SetOffsetSize(Vec3(5, 5, 5));
-	// テスト用にItemにしてオーバーラップするところ見せてるよ。後で消してね
-	col->SetResponseObject(ResponseObject::ItemsPawn);
-	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
+	//// テスト用にItemにしてオーバーラップするところ見せてるよ。後で消してね
+	//col->SetResponseObject(ResponseObject::ItemsPawn);
+	//col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
 
 
 }

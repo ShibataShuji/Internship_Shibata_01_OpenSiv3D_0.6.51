@@ -1,10 +1,32 @@
 ﻿#pragma once
 
+//#include "Collision_Sub.h"	// Collisionで計算に使う関数を書いている
 
 // 前方宣言
 class Collision_Sphere;
 class Collision_Box;
 class Collision_Capsule;
+
+
+
+// 1つのOrientedBoxからつくられた6つの面
+struct OrientedBoxSurfaces {
+
+	OrientedBox m_Surfaces[6];
+	Vec3		m_Normal[6];
+	Vec3		m_Corners[8];
+};
+
+// 関数宣言
+void CreateOrientedBoxSurfaces(const OrientedBox* box, OrientedBoxSurfaces* ret_surfaces);
+void Sphere_HitOneSurface(const Sphere* sphere, const OrientedBoxSurfaces* surfaces, Array<int>* hit, Vec3* ret_cp);
+Array<int> Sphere_HitTwoSurface(Sphere* sphere, OrientedBoxSurfaces* surfaces, Array<int>* hit, Vec3* ret_cp);
+Array<int> Sphere_HitThreeSurface(Sphere* sphere, OrientedBoxSurfaces* surfaces, Array<int>* hit, Vec3* ret_cp);
+void Sphere_Box_GetHitSurfaceNormal(Sphere* sphere, const OrientedBox* box, Array<Vec3>* ret_normal, int* ret_hitnum, Vec3* ret_cp);
+void CalulateDivisionToHit_Sphere_Box(const Vec3& oldpos, int divmin, int divmax, const Vec3& oneValue, const Sphere* sphere, const OrientedBox* box, int* ret_hitdivnum, Vec3* ret_hitpos);
+
+
+
 
 // もつことのできるコリジョンの種類
 enum class CollisionType
@@ -78,7 +100,7 @@ protected:
 
 
 	// 1フレーム前の値
-	Vec3	m_DeltaPosition = Vec3(0, 0, 0);
+	Vec3	m_OldPosition = Vec3(0, 0, 0);
 
 
 
@@ -95,6 +117,8 @@ public:
 	Vec3 GetPosition() { return m_Position; }
 	Vec3 GetRotation() { return m_Rotation; }
 	Vec3 GetSize() { return m_Size; }
+
+	Vec3 GetOldPosition() { return m_OldPosition; }
 
 	CollisionType GetCollisionType() { return m_CollisionType; }
 	void SetCollisionType(CollisionType CollisionType) { m_CollisionType = CollisionType; }
@@ -184,27 +208,3 @@ public:
 	}
 
 };
-
-
-
-
-//// 最接近点を求める関数
-//static void ClosestPtPointOBB(const Vec3& point, const Vec3& box_center, const Vec3 *box_rotnormal, const float* box_axissize,  Vec3& retvec)
-//{
-//	Vec3 d = point - box_center;	// OBB->ポイント のベクトル
-//	retvec = box_center;
-//	float dist;
-//	for (int i = 0; i < 3; i++)
-//	{
-//		dist = d.dot(box_rotnormal[i]);
-//		if (dist > box_axissize[i])						// 内積は符号がつく
-//		{
-//			dist = box_axissize[i];
-//		}
-//		if (dist < -box_axissize[i])
-//		{
-//			dist = -box_axissize[i];
-//		}
-//		retvec += dist * box_rotnormal[i];
-//	}
-//}

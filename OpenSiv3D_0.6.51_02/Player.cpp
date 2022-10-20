@@ -47,10 +47,11 @@ void Player::Update()
 	MovVel.x *= friction;
 	MovVel.z *= friction;
 	float little = 0.04f;	// 止まる誤差。AddVelValより小さな値を設定
-	if (abs(MovVel.x) < little)
+	if (MovVel.lengthSq() < pow(little, 2))
+	{
 		MovVel.x = 0;
-	if (abs(MovVel.z) < little)
 		MovVel.z = 0;
+	}
 	SetVelocity(MovVel);
 	
 

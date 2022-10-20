@@ -117,6 +117,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Collision_Box.cpp" />
     <ClCompile Include="Collision_Sphere.cpp" />
+    <ClCompile Include="Collision_Sub.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Collision_Box.h" />
     <ClInclude Include="Collision_Sphere.h" />
+    <ClInclude Include="Collision_Sub.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="FPSCamera.h" />

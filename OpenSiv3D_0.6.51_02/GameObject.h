@@ -37,6 +37,7 @@ public:
 
 	virtual ~GameObject()
 	{
+		
 		for (auto c : m_ComponentList)
 		{
 			if (c != nullptr)
@@ -44,8 +45,6 @@ public:
 		}
 		m_ComponentList.clear();
 
-		//for (auto c : m_ComponentNameList)	// これはクラスじゃないのでdeleteする必要ない
-		//	delete c;
 		m_ComponentNameList.clear();
 
 		for (auto c : m_Child)

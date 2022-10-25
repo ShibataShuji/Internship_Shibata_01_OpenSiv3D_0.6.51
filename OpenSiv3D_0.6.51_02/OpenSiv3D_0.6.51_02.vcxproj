@@ -122,6 +122,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="KnifeBlock.cpp" />
+    <ClCompile Include="KnifeBullet.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ManagerManager.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -130,6 +131,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Title.cpp" />
+    <ClCompile Include="TPSRay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\engine\texture\box-shadow\128.png" />
@@ -337,10 +339,12 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GD_GameObjectListData.h" />
     <ClInclude Include="KnifeBlock.h" />
+    <ClInclude Include="KnifeBullet.h" />
     <ClInclude Include="ManagerManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Title.hpp" />
+    <ClInclude Include="TPSRay.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">

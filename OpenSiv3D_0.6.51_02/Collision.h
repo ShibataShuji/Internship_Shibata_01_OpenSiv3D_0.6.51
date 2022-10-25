@@ -42,7 +42,6 @@ enum class ResponseType
 	Ignore,
 	Overlap,
 	Block,
-	NotSet
 };
 
 
@@ -52,7 +51,9 @@ enum class ResponseObject
 	BlocksPawn,
 	EnemysPawn,
 	PlayersPawn,
-	ItemsPawn
+	ItemsPawn,
+	PlayerBullet,
+	PlayerGround
 };
 
 
@@ -65,6 +66,9 @@ private:
 	// コリジョンの可視性
 	bool		m_Visibility = true;
 	ColorF		m_ColorF = Linear::Palette::Aqua;
+
+	// Blockの時、true:衝突したところで止まる。	false:壁ずりさせる
+	bool		m_HittoStop = false;
 
 
 protected:
@@ -80,10 +84,12 @@ protected:
 	{
 		// レスポンスオブジェクトの種類分作成する。今回はエンジン作るわけじゃないので静的でOK。
 		// むしろ途中で追加されたりしてちゃんと検索に引っかからない可能性出るからここでセットする以外触らない。
-		{ ResponseObject::BlocksPawn, ResponseType::NotSet },
-		{ ResponseObject::EnemysPawn, ResponseType::NotSet },
-		{ ResponseObject::PlayersPawn, ResponseType::NotSet },
-		{ ResponseObject::ItemsPawn, ResponseType::NotSet },
+		{ ResponseObject::BlocksPawn, ResponseType::Ignore },
+		{ ResponseObject::EnemysPawn, ResponseType::Ignore },
+		{ ResponseObject::PlayersPawn, ResponseType::Ignore },
+		{ ResponseObject::ItemsPawn, ResponseType::Ignore },
+		{ ResponseObject::PlayerBullet, ResponseType::Ignore },
+		{ ResponseObject::PlayerGround, ResponseType::Ignore },
 	};
 	// 動的にしたい場合、こんな風に追加すればOK
 	//table.emplace(U"Yellow", 5);
@@ -91,11 +97,13 @@ protected:
 	// 親を考慮しないオフセット値
 	Vec3	m_OffsetPosition = Vec3(0, 0, 0);
 	Vec3	m_OffsetRotation = Vec3(0, 0, 0);
+	Quaternion	m_OffsetQuaternion = Quaternion::Identity();
 	Vec3	m_OffsetSize = Vec3(1, 1, 1);
 
 	// 親も考慮した計算後の値
 	Vec3	m_Position = Vec3(0, 0, 0);
 	Vec3	m_Rotation = Vec3(0, 0, 0);
+	Quaternion	m_Quaternion = Quaternion::Identity();
 	Vec3	m_Size = Vec3(1, 1, 1);
 
 
@@ -110,13 +118,23 @@ public:
 	using Component::Component;
 
 	void SetOffsetPosition(Vec3 position) { m_OffsetPosition = position; }
-	void SetOffsetRotation(Vec3 rotation) { m_OffsetRotation = rotation; }
+	void SetOffsetRotation(Vec3 rotation)
+	{
+		m_OffsetRotation = rotation;
+		Quaternion Qua = Quaternion::Identity();
+		m_OffsetQuaternion = Qua.RollPitchYaw<double, double, double>(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+	}
+	void SetOffsetm_Quaternion(Quaternion quaternion) { m_OffsetQuaternion = quaternion; }
 	void SetOffsetSize(Vec3 size) { m_OffsetSize = size; }
 	void SetOffsetSize(Vec2 size) { m_OffsetSize.x = size.x; m_OffsetSize.y = size.y; m_OffsetSize.z = size.x; }
 	void SetOffsetSize(float size) { m_OffsetSize.x = size; m_OffsetSize.y = size, m_OffsetSize.z = size;}
 	Vec3 GetPosition() { return m_Position; }
 	Vec3 GetRotation() { return m_Rotation; }
+	Quaternion GetQuaternion() { return m_Quaternion; }
 	Vec3 GetSize() { return m_Size; }
+
+	void SetHittoStop(bool hittostop) { m_HittoStop = hittostop; }
+	bool GetHittoStop() { return m_HittoStop; }
 
 	Vec3 GetOldPosition() { return m_OldPosition; }
 
@@ -200,11 +218,11 @@ public:
 
 
 
-	Quaternion GetQuaternion()
+	Quaternion GetQuaternionForRotation()
 	{
 		Quaternion Qua = Quaternion::Identity();	// 演算用に基本形のクォータニオンをを作成
-
-		return Qua.RollPitchYaw<double, double, double>(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+		m_Quaternion = Qua.RollPitchYaw<double, double, double>(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+		return m_Quaternion;
 	}
 
 };

@@ -31,3 +31,41 @@ public:
 
 
 };
+
+
+
+//クォータニオンを回転行列にする
+static Mat4x4 QuaternionToMatrix(const Quaternion &q)
+{
+	Mat4x4 ret = Mat4x4::Identity();
+
+	float sx = q.getX() * q.getX();
+	float sy = q.getY() * q.getY();
+	float sz = q.getZ() * q.getZ();
+	float cx = q.getY() * q.getZ();
+	float cy = q.getX() * q.getZ();
+	float cz = q.getX() * q.getY();
+	float wx = q.getW() * q.getX();
+	float wy = q.getW() * q.getY();
+	float wz = q.getW() * q.getZ();
+
+	ret = Mat4x4::Set(
+	1.0f - 2.0f * (sy + sz),
+	2.0f * (cz + wz),
+	2.0f * (cy - wy),
+		0.0f,
+	2.0f * (cz - wz),
+	1.0f - 2.0f * (sx + sz),
+	2.0f * (cx + wx),
+		0.0f,
+	2.0f * (cy + wy),
+	2.0f * (cx - wx),
+	1.0f - 2.0f * (sx + sy),
+		0.0f,
+	0.0f,
+	0.0f,
+	0.0f,
+		1.0f
+	);
+	return ret;
+}

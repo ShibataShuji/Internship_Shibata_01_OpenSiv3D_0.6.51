@@ -7,8 +7,7 @@ void Collision::UpdateCollisionState()
 	// 1フレーム前の値を保存
 	m_OldPosition = m_Position;
 
-	// ポジションや回転などを親を考慮して更新する
-	Vec3 fff = m_ParentGameObject->GetPosition();
+	// ポジションや回転などを親を考慮して更新する。現在回転を考慮できていない。が今回のゲームで使わなそうなので割愛。
 	m_Position = m_OffsetPosition + m_ParentGameObject->GetPosition();
 	m_Rotation = m_OffsetRotation + m_ParentGameObject->GetRotation();
 	m_Size = m_OffsetSize * m_ParentGameObject->GetScaleRate();
@@ -41,6 +40,10 @@ void Collision::Update()
 
 		// 自分だったらコンテニュー。同じオブジェクトが複数コリジョンコンポーネントを持っててもここで無視される
 		if (OtherObject == m_ParentGameObject)
+			continue;
+
+		// 自分の子供だったらコンテニュー。
+		if (m_ParentGameObject->GetChild(OtherObject))
 			continue;
 
 		//// 全てのオブジェクトの中からCollisionコンポーネントを持っていなかったらコンテニュー
@@ -179,7 +182,7 @@ void Collision::Update()
 				}
 
 				//if (blocked)
-				//	m_ParentGameObject->Collision_AddOverlapObject(OtherObject);
+				//	m_ParentGameObject->Collision_AddHitObject(OtherObject);
 			}
 
 
@@ -235,7 +238,7 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 		Vec3 ChangeValue = IgnorePos - OldPos;
 		double Changelength = ChangeValue.length();
 
-		// 衝突した瞬間まで戻す(衝突しない最後+1)
+		// 衝突した瞬間まで戻す
 
 		// 分割数と１分割での値を求める
 		int divnum = 1000;
@@ -276,6 +279,16 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 			Vec3 FinPos = beforhitpos + AlongWallVec * RemainingLength;
 
 			t_sphere.setPos(FinPos);
+
+			// HitObjectとして登録する
+			if (ColSphere == this)
+			{
+				ColSphere->GetParentGameObject()->Collision_AddHitObject(ColBox->GetParentGameObject(), cp, SurfaceNormal.at(0));
+			}
+			else
+			{
+				ColBox->GetParentGameObject()->Collision_AddHitObject(ColSphere->GetParentGameObject(), cp, SurfaceNormal.at(0));
+			}
 		}
 		else if (hitnum >= 2)
 		{
@@ -318,6 +331,15 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 					else
 					{
 						Print << U"かいひ！222"_fmt();
+						// HitObjectとして登録する
+						if (ColSphere == this)
+						{
+							ColSphere->GetParentGameObject()->Collision_AddHitObject(ColBox->GetParentGameObject(), cp, SurfaceNormal.at(i));
+						}
+						else
+						{
+							ColBox->GetParentGameObject()->Collision_AddHitObject(ColSphere->GetParentGameObject(), cp, SurfaceNormal.at(i));
+						}
 						break;
 					}
 
@@ -338,6 +360,15 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 							{
 								Print << U"かいひ！333"_fmt();
 								yaba = false;
+								// HitObjectとして登録する
+								if (ColSphere == this)
+								{
+									ColSphere->GetParentGameObject()->Collision_AddHitObject(ColBox->GetParentGameObject(), cp, SurfaceNormal.at(j));
+								}
+								else
+								{
+									ColBox->GetParentGameObject()->Collision_AddHitObject(ColSphere->GetParentGameObject(), cp, SurfaceNormal.at(j));
+								}
 								break;
 							}
 							// 最終的に計算してもどうしてもだめだったら
@@ -354,26 +385,52 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 				{
 					// 衝突していなかったら正しいので抜ける
 					Print << U"ただしいー"_fmt();
+					// HitObjectとして登録する
+					if (ColSphere == this)
+					{
+						ColSphere->GetParentGameObject()->Collision_AddHitObject(ColBox->GetParentGameObject(), cp, SurfaceNormal.at(i));
+					}
+					else
+					{
+						ColBox->GetParentGameObject()->Collision_AddHitObject(ColSphere->GetParentGameObject(), cp, SurfaceNormal.at(i));
+					}
 					break;
 				}
 			}
 
 
 		}
-		// m_Positionの更新もする。ここでしなきゃいけないのどうにかした方がいい。
-		m_Position = t_sphere.center;
-		//*ColSphere->GetSphere() = t_sphere;
-		ColSphere->GetSphere()->set(t_sphere);
-		//ColBox->GetOrientedBox() = t_box;
-		//ColSphere->GetParentGameObject()->SetVelocity(Vec3(0, 0, 0));
-		// 親のオブジェクトも移動させる
-		ColSphere->GetParentGameObject()->SetPosition(m_Position);
 
+		// 壁ずりしない設定なら
+		if (ColSphere->GetHittoStop())
+		{
+			Vec3 MomentBeforeHit = MomentHitSphere.center - oneValue;
+			// m_Positionの更新もする。
+			m_Position = MomentBeforeHit;
+			ColSphere->GetSphere()->setPos(MomentBeforeHit);
+			ColSphere->GetSphere()->setR(t_sphere.r);
+			//*ColBox->GetOrientedBox() = t_box;		// Boxは動かしたりしていないので触らない。
+			// 親のオブジェクトも移動させる
+			ColSphere->GetParentGameObject()->SetPosition(m_Position);
+		}
+		else
+		{
+			// 壁ずりする設定(デフォルトこっち)なら
+			// m_Positionの更新もする。
+			m_Position = t_sphere.center;
+			ColSphere->GetSphere()->set(t_sphere);
+			//*ColBox->GetOrientedBox() = t_box;		// Boxは動かしたりしていないので触らない。
+			// 親のオブジェクトも移動させる
+			ColSphere->GetParentGameObject()->SetPosition(m_Position);
+
+		}
+
+		return true;
 	}
 	else
 	{
 		// そもそも衝突していなかったら、なにもしない。
-
+		return false;
 	}
 
 	return false;

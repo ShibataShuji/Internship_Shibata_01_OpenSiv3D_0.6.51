@@ -18,9 +18,8 @@ private:
 	const MSRenderTexture renderTexture{ Scene::Size(), TextureFormat::R8G8B8A8_Unorm_SRGB, HasDepth::Yes };
 
 	// メインとなるプレイヤー
-	Player* m_Player;
+	Player*		  m_Player;
 
-	Vec3 eyePosition{ 0, 2, -16 };
-	BasicCamera3D camera{ renderTexture.size(), 30_deg, Vec3{ 0, 16, -32 }, Vec3{ 0, 0, 1 } };
+	Vec3		  m_EyePosition{ 0, 2, -16 };
 
 };

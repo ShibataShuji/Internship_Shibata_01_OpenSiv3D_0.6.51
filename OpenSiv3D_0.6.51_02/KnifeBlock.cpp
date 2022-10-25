@@ -6,21 +6,24 @@ void KnifeBlock::Init()
 	// このオブジェクトの名前
 	m_Name = U"KnifeBlock";
 
-	/*auto col = AddComponent<Collision_Box>();
+	auto col = AddComponent<Collision_Box>();
 	col->SetResponseObject(ResponseObject::BlocksPawn);
-	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
-	col->SetOffsetSize(Vec3(5, 5, 5));*/
+	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Ignore);
+	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Ignore);
+	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Ignore);
+	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Block);
+	col->SetResponseTableOneItem(ResponseObject::PlayerBullet, ResponseType::Ignore);
+	col->SetResponseTableOneItem(ResponseObject::PlayerGround, ResponseType::Overlap);
+	col->SetOffsetSize(Vec3(6, 0.8, 6));
 
-	auto col = AddComponent<Collision_Sphere>();
-	col->SetResponseObject(ResponseObject::ItemsPawn);
-	col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
-	col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
-	col->SetOffsetSize(5.0f);
+	//auto col = AddComponent<Collision_Sphere>();
+	//col->SetResponseObject(ResponseObject::BlocksPawn);
+	//col->SetResponseTableOneItem(ResponseObject::BlocksPawn, ResponseType::Overlap);
+	//col->SetResponseTableOneItem(ResponseObject::EnemysPawn, ResponseType::Overlap);
+	//col->SetResponseTableOneItem(ResponseObject::ItemsPawn, ResponseType::Overlap);
+	//col->SetResponseTableOneItem(ResponseObject::PlayersPawn, ResponseType::Overlap);
+	//col->SetResponseTableOneItem(ResponseObject::PlayerBullet, ResponseType::Ignore);
+	//col->SetOffsetSize(5.0f);
 }
 
 
@@ -32,11 +35,15 @@ void KnifeBlock::Uninit()
 
 void KnifeBlock::Update()
 {
-	GameObject::Update();		// 最初に持ってくる
+	// 最初に持ってくる
+	GameObject::Update();
 
 	AddPosition(GetVelocity());
+	//AddRotation(GetRotationSpeed());
 
-	GameObject::ComponentUpdate();		// 最後に持ってくる
+	// 最後に持ってくる
+	GameObject::ComponentUpdate();
+	GameObject::ChildUpdate();
 }
 
 

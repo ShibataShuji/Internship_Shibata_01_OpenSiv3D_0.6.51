@@ -28,6 +28,8 @@ void Main()
 	// ゲームシーンから開始したい場合はこのコメントを外す
 	manager.init(State::Game);
 
+	TPSRay::RayInit();
+
 	while (System::Update())
 	{
 		if (not manager.update())

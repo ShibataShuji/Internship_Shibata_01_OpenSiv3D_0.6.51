@@ -11,12 +11,20 @@ struct GD_GameObjectListData
 	{
 		if (!GameObjectList.empty())
 		{
-			// 途中でゲームオブジェクトの数が変わる可能性があるのでautoで範囲forするのはダメみたい。
+			// このフレームでの初期化
+			for (auto& GameObject : GameObjectList)
+			{
+				// 全てアップデートが１回もされてない状態に戻す
+				GameObject->SetUpdateOnece(false);
+			}
+
+			// 途中でゲームオブジェクトの数が変わる可能性があるのでautoで範囲forするのはよくなかった。
 			UpdateObjectNum = GameObjectList.size();
 			for (int i = 0; i < UpdateObjectNum; i++)
 			{
 				auto& GameObject = GameObjectList[i];
-				GameObject->Update();
+				if(GameObject->UpdateOnceCheck())		// このフレームでのアップデートが1回目なら行う
+					GameObject->Update();
 			}
 			/*for (auto& GameObject : GameObjectList)
 			{

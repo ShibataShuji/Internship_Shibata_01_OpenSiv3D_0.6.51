@@ -14,6 +14,6 @@ void Collision_Box::UpdateCollisionState()
 	Collision::UpdateCollisionState();
 
 	m_OrientedBox.setPos(m_Position);
-	m_OrientedBox.setOrientation(GetQuaternion());
+	m_OrientedBox.setOrientation(GetQuaternionForRotation());
 	m_OrientedBox.setSize(m_Size);
 }

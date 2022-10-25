@@ -22,7 +22,7 @@ public:
 		m_CollisionType = CollisionType::Box;
 
 		m_OrientedBox.setPos(m_Position);
-		m_OrientedBox.setOrientation(GetQuaternion());
+		m_OrientedBox.setOrientation(GetQuaternionForRotation());
 		m_OrientedBox.setSize(m_Size);
 	}
 

@@ -8,6 +8,7 @@
 
 // 他の干渉がないデータ系
 #include"FPSCamera.h"
+#include "TPSRay.h"
 
 // コンポーネント系
 #include "Component.h"
@@ -24,7 +25,8 @@
 
 // ゲームオブジェクト系
 #include "Player.h"
-#include "KnifeBlock.h"	// プレイヤーが発射する特殊なブロック
+#include "KnifeBullet.h"	// プレイヤーが発射する特殊なブロック
+#include "KnifeBlock.h"		// プレイヤーが発射する特殊なブロック
 
 #include "Blocks.h"
 

@@ -180,6 +180,12 @@
     <ClCompile Include="Collision_Sub.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KnifeBullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TPSRay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\icon.ico">
@@ -855,6 +861,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Collision_Sub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KnifeBullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TPSRay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

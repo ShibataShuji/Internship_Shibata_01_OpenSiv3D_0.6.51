@@ -11,7 +11,8 @@ enum class GameStep
 {
 	NowGame,
 	Standby,
-	Result
+	Result,
+	Pause
 };
 
 
@@ -39,6 +40,8 @@ private:
 	Stopwatch	m_Stopwatch;// { StartImmediately::Yes };
 
 	bool		m_SE_Once[3];
+
+	bool		m_PauseOnce = false;
 
 public:
 
@@ -99,4 +102,11 @@ public:
 	Rect m_BackStageSelectButton{ Arg::center = Scene::Center().movedBy(250, 300), 300, 60 };
 	Transition m_BackStageSelectTransition{ 0.4s, 0.2s };
 
+
+	// ポーズの時のもう一度遊ぶボタンと、ステージ選択に戻るボタン
+	Rect m_P_RetryButton{ Arg::center = Scene::Center().movedBy(-250, 300), 300, 60 };
+	Transition m_P_RetryTransition{ 0.4s, 0.2s };
+
+	Rect m_P_BackStageSelectButton{ Arg::center = Scene::Center().movedBy(250, 300), 300, 60 };
+	Transition m_P_BackStageSelectTransition{ 0.4s, 0.2s };
 };

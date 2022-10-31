@@ -57,6 +57,20 @@ void Game::update()
 		StandbyGameInit();
 	}
 
+	// ステージ選択へ戻る
+	if (KeyR.pressed())
+	{
+		AudioAsset(U"SE_Button_Enter").playOneShot();
+		// ゲームオブジェクトを全部消す
+		getData().GameObjectListData.DelteAllGameObjectList();
+		getData().StopwatchData.reset();
+		getData().Title_Step = 1;
+		// ゲームシーンへ
+		changeScene(State::Title);
+	}
+
+	m_PauseOnce = false;
+
 	//// デバッグモード
 	//if (Key0.pressed())
 	//	getData().DebugMode = true;
@@ -64,10 +78,60 @@ void Game::update()
 	//	getData().DebugMode = false;
 	//m_Player->m_DebugMode = getData().DebugMode;
 
+	if (m_GameStep == GameStep::Pause)
+	{
+		if(!getData().StopwatchData.isPaused())
+			getData().StopwatchData.pause();
+
+		if (KeyP.pressed() && m_PauseOnce == false)
+		{
+			m_GameStep = GameStep::NowGame;
+			m_PauseOnce = true;
+		}
+
+
+		// トランジション処理
+		m_P_RetryTransition.update(m_P_RetryButton.mouseOver());
+		m_P_BackStageSelectTransition.update(m_P_BackStageSelectButton.mouseOver());
+
+		// カーソルの見た目を変える処理
+		if (m_P_RetryButton.mouseOver() || m_P_BackStageSelectButton.mouseOver())
+		{
+			Cursor::RequestStyle(CursorStyle::Hand);
+		}
+
+		if (m_P_RetryButton.leftClicked())
+		{
+			AudioAsset(U"SE_Button_Enter").playOneShot();
+			// ゲームオブジェクトを全部消す
+			getData().GameObjectListData.DelteAllGameObjectList();
+			getData().StopwatchData.reset();
+			// ゲームシーンへ
+			changeScene(State::Game);
+			return;
+		}
+
+		if (m_P_BackStageSelectButton.leftClicked())
+		{
+			AudioAsset(U"SE_Button_Enter").playOneShot();
+			// ゲームオブジェクトを全部消す
+			getData().GameObjectListData.DelteAllGameObjectList();
+			getData().Title_Step = 1;
+			// ゲームシーンへ
+			changeScene(State::Title);
+			return;
+		}
+	}
+
 
 	
 	if (m_GameStep == GameStep::NowGame)
 	{
+		if (KeyP.pressed() && m_PauseOnce == false)
+		{
+			//m_GameStep = GameStep::Pause;
+		}
+
 		getData().GameObjectListData.UpdateGameObjectList();
 
 		// プレイヤーがゴールオブジェクトに触れていたら
@@ -240,7 +304,7 @@ void Game::update()
 	// どのゲームステップだとしてもアップデートされるもの
 	{
 		// FPS視点でのマウスでのカメラ操作。リザルト以外で操作可能
-		if (m_GameStep != GameStep::Result)
+		if (m_GameStep != GameStep::Result || m_GameStep != GameStep::Pause)
 		{
 			TPSRay::GetFPSCamera()->AddDirectionX(-1.0f * Cursor::DeltaF().x);
 			TPSRay::GetFPSCamera()->AddDirectionY(-1.0f * Cursor::DeltaF().y);
@@ -410,8 +474,14 @@ void Game::GameStepDraw() const
 		}
 	}
 
+	if (m_GameStep == GameStep::Pause)
+	{
+		m_P_RetryButton.draw(ColorF{ 1.0, m_P_RetryTransition.value() }).drawFrame(2);
+		FontAsset(U"Menu")(U"Retry").drawAt(m_P_RetryButton.center(), ColorF{ 0.25 });
 
-
+		m_P_BackStageSelectButton.draw(ColorF{ 1.0, m_P_BackStageSelectTransition.value() }).drawFrame(2);
+		FontAsset(U"Menu")(U"StageSelect").drawAt(m_P_BackStageSelectButton.center(), ColorF{ 0.25 });
+	}
 
 	if (m_GameStep == GameStep::Result)
 	{

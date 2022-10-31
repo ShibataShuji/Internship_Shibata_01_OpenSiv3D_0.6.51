@@ -16,6 +16,7 @@ struct GD_GameObjectListData
 			// このフレームでの初期化
 			for (auto& GameObject : GameObjectList)
 			{
+				
 				if (ignorePlayer)
 				{
 					if (GameObject->GetName() == U"Player")

@@ -44,4 +44,6 @@ public:
 
 	void Movement();
 
+	double m_time = 0;
+
 };

@@ -3,8 +3,8 @@
 
 void Main()
 {
-	//Window::Resize(1280, 720);
-	Window::SetFullscreen(true);
+	Window::Resize(1280, 720);
+	//Window::SetFullscreen(true);
 
 
 

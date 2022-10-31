@@ -230,8 +230,8 @@ void Title::draw() const
 
 	if(getData().Title_Step == 0)
 	{
-		FontAsset(U"TitleFont")(U"BREAKOUT")
-			.drawAt(TextStyle::OutlineShadow(0.2, ColorF{ 0.2, 0.6, 0.2 }, Vec2{ 3, 3 }, ColorF{ 0.0, 0.5 }), 100, Vec2{ 400, 100 });
+		FontAsset(U"TitleFont")(U"アタッチブロッチ！")
+			.drawAt(TextStyle::OutlineShadow(0.2, ColorF{ 0.2, 0.6, 0.2 }, Vec2{ 5, 5 }, ColorF{ 0.0, 0.5 }), 100, Vec2{ 500, 100 });
 
 		m_startButton.draw(ColorF{ 1.0, m_startTransition.value() }).drawFrame(2);
 		//m_rankingButton.draw(ColorF{ 1.0, m_rankingTransition.value() }).drawFrame(2);

@@ -89,6 +89,7 @@ public:
 			m_UpdateFirst = false;
 			return true;
 		}
+		return false;
 	}
 
 	// ゴールの方向への矢印の描写

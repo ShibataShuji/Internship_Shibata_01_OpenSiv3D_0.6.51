@@ -4,6 +4,7 @@
 
 void Player::Init()
 {
+	m_time = 0;
 	// このオブジェクトの名前
 	m_Name = U"Player";
 
@@ -44,6 +45,11 @@ void Player::Update()
 {
 	// 最初に持ってくる
 	GameObject::Update();
+	if (m_time < 1.0)
+	{
+		m_time += Scene::DeltaTime();
+		return;
+	}
 
 	Vec3 Forward = TPSRay::GetFPSCamera()->GetForward();
 	Vec3 Right = TPSRay::GetFPSCamera()->GetRight();

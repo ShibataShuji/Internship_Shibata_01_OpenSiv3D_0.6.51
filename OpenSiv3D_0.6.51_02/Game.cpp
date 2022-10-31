@@ -303,8 +303,8 @@ void Game::update()
 
 	// どのゲームステップだとしてもアップデートされるもの
 	{
-		// FPS視点でのマウスでのカメラ操作。リザルト以外で操作可能
-		if (m_GameStep != GameStep::Result || m_GameStep != GameStep::Pause)
+		// FPS視点でのマウスでのカメラ操作。ゲーム中かスタンバイ状態の時のみ
+		if (m_GameStep == GameStep::NowGame || m_GameStep == GameStep::Standby)
 		{
 			TPSRay::GetFPSCamera()->AddDirectionX(-1.0f * Cursor::DeltaF().x);
 			TPSRay::GetFPSCamera()->AddDirectionY(-1.0f * Cursor::DeltaF().y);

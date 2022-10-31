@@ -4,6 +4,7 @@
 // 子供の座標や回転などの計算
 void GameObject::ParentChildCalculate()
 {
+
 	// スケール 掛け算
 	m_ScaleRate = m_OffsetScaleRate * m_Parent->GetScaleRate();
 	// 回転 足し算

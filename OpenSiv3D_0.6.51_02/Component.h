@@ -50,17 +50,21 @@ public:
 
 
 
-	String GetComponentName()
+	String& GetComponentName()
 	{
 		return m_CompName;
 	}
+	/*void SetComponentName(const String compname)
+	{
+		m_CompName = compname;
+	}*/
 
-	int GetComponentID()
+	int& GetComponentID()
 	{
 		return m_CompId;
 	}
 
-	int GetComponentUpdatePriority()
+	int& GetComponentUpdatePriority()
 	{
 		return m_UpdatePriority;
 	}

@@ -6,11 +6,16 @@ void Collision::UpdateCollisionState()
 {
 	// 1フレーム前の値を保存
 	m_OldPosition = m_Position;
+	m_OldRotation = m_Rotation;
 
 	// ポジションや回転などを親を考慮して更新する。現在回転を考慮できていない。が今回のゲームで使わなそうなので割愛。
 	m_Position = m_OffsetPosition + m_ParentGameObject->GetPosition();
 	m_Rotation = m_OffsetRotation + m_ParentGameObject->GetRotation();
 	m_Size = m_OffsetSize * m_ParentGameObject->GetScaleRate();
+
+	// 変化量
+	m_DeltaPosition = m_Position - m_OldPosition;
+	m_DeltaRotation = m_Rotation - m_OldRotation;
 }
 
 void Collision::Update()
@@ -83,7 +88,7 @@ void Collision::Update()
 				// Sphere*Sphere
 				if (SelfType == CollisionType::Sphere && OtherType == CollisionType::Sphere)
 				{
-					
+					overlaped = SphereSphereOverlap(SelfCollision, OtherCollision);
 				}
 				// Sphere*Box
 				else if (SelfType == CollisionType::Sphere && OtherType == CollisionType::Box)
@@ -157,8 +162,12 @@ void Collision::Update()
 				// Box*Sphere
 				else if (SelfType == CollisionType::Box && OtherType == CollisionType::Sphere)
 				{
-					// Block は処理が重たいのでSphereからしかとらないようにする
-					//blocked = SphereBoxBlock(OtherCollision, SelfCollision);
+					// BoxSpher   *Sphere*Boxとは違うので注意
+					if (!SelfCollision->GetDeltaRotation().isZero())
+					{
+						//blocked = SphereBoxBlock(OtherCollision, SelfCollision);
+						blocked = BoxSphereBlock_Rotation(SelfCollision, OtherCollision);
+					}
 				}
 				// Box*Capsule
 				else if (SelfType == CollisionType::Box && OtherType == CollisionType::Capsule)
@@ -219,7 +228,7 @@ bool Collision::BoxBoxOverlap(Collision* ColA_Box, Collision* ColB_Box)
 	return ColBoxA->GetOrientedBox()->intersects(*ColBoxB->GetOrientedBox());
 }
 
-
+// Sphere側が動いて当たった場合。
 bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 {
 	Collision_Sphere* ColSphere = static_cast <Collision_Sphere*>(ColA_Sphere);
@@ -312,7 +321,7 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 				t_sphere.setPos(beforhitpos);
 				if (t_sphere.intersects(t_box))
 				{
-					Print << U"なんであたってる？"_fmt();
+					//Print << U"なんであたってる？"_fmt();
 				}
 
 				t_sphere.setPos(FinPos);
@@ -321,16 +330,16 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 				if (t_sphere.intersects(t_box))
 				{
 					// 衝突していたら正しくないのでもっかい
-					Print << U"しょうとつしてる"_fmt();
+					//Print << U"しょうとつしてる"_fmt();
 					FinPos = (beforhitpos + AlongWallVec * RemainingLength) + (SurfaceNormal.at(i) * RemainingLength * 0.1);
 					t_sphere.setPos(FinPos);
 					if (t_sphere.intersects(t_box))
 					{
-						Print << U"しょうとつしてる222"_fmt();
+						//Print << U"しょうとつしてる222"_fmt();
 					}
 					else
 					{
-						Print << U"かいひ！222"_fmt();
+						//Print << U"かいひ！222"_fmt();
 						// HitObjectとして登録する
 						if (ColSphere == this)
 						{
@@ -345,7 +354,7 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 
 					if (i == hitnum - 1)
 					{
-						Print << U"やばああい"_fmt();
+						//Print << U"やばああい"_fmt();
 						bool yaba = true;
 						// 衝突している面のどこかの方向にすこしずらす
 						for (int j = 0; j < hitnum; j++)
@@ -354,11 +363,11 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 							t_sphere.setPos(FinPos);
 							if (t_sphere.intersects(t_box))
 							{
-								Print << U"しょうとつしてる333"_fmt();
+								//Print << U"しょうとつしてる333"_fmt();
 							}
 							else
 							{
-								Print << U"かいひ！333"_fmt();
+								//Print << U"かいひ！333"_fmt();
 								yaba = false;
 								// HitObjectとして登録する
 								if (ColSphere == this)
@@ -384,7 +393,7 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 				else
 				{
 					// 衝突していなかったら正しいので抜ける
-					Print << U"ただしいー"_fmt();
+					//Print << U"ただしいー"_fmt();
 					// HitObjectとして登録する
 					if (ColSphere == this)
 					{
@@ -406,22 +415,25 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 		{
 			Vec3 MomentBeforeHit = MomentHitSphere.center - oneValue;
 			// m_Positionの更新もする。
-			m_Position = MomentBeforeHit;
+			//m_Position = MomentBeforeHit;
+			ColSphere->SetPosition(MomentBeforeHit);
 			ColSphere->GetSphere()->setPos(MomentBeforeHit);
 			ColSphere->GetSphere()->setR(t_sphere.r);
 			//*ColBox->GetOrientedBox() = t_box;		// Boxは動かしたりしていないので触らない。
 			// 親のオブジェクトも移動させる
-			ColSphere->GetParentGameObject()->SetPosition(m_Position);
+			//ColSphere->GetParentGameObject()->SetPosition(m_Position);
+			ColSphere->GetParentGameObject()->SetPosition(ColSphere->GetPosition());
 		}
 		else
 		{
 			// 壁ずりする設定(デフォルトこっち)なら
 			// m_Positionの更新もする。
-			m_Position = t_sphere.center;
+			//m_Position = t_sphere.center;
+			ColSphere->SetPosition(t_sphere.center);
 			ColSphere->GetSphere()->set(t_sphere);
 			//*ColBox->GetOrientedBox() = t_box;		// Boxは動かしたりしていないので触らない。
 			// 親のオブジェクトも移動させる
-			ColSphere->GetParentGameObject()->SetPosition(m_Position);
+			ColSphere->GetParentGameObject()->SetPosition(ColSphere->GetPosition());
 
 		}
 
@@ -437,6 +449,69 @@ bool Collision::SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box)
 }
 
 
+// Box側が動いて当たった場合。の回転のみ。
+bool Collision::BoxSphereBlock_Rotation(Collision* ColA_Box, Collision* ColB_Sphere)
+{
+	Collision_Box* ColBox = static_cast <Collision_Box*>(ColA_Box);
+	Collision_Sphere* ColSphere = static_cast <Collision_Sphere*>(ColB_Sphere);
+
+	// まず普通にOrientedBoxとSphereで衝突しているかをとる
+	if (ColSphere->GetSphere()->intersects(*ColBox->GetOrientedBox()))
+	{
+
+		// 箱の前回の回転を取得
+		Vec3 Rotation = ColA_Box->GetRotation();
+		Vec3 OldRotation = ColA_Box->GetOldRotation();
+		Vec3 DeltaRotation = ColA_Box->GetDeltaRotation();
+
+		// 衝突する寸前まで戻す
+
+		// 分割数と１分割での値を求める
+		int divnum = 100;
+		float divinversenum = 1.0 / divnum;	// 割り算使いたくないけど逆数の求め方がわからなかった
+		Vec3 oneValue = DeltaRotation * divinversenum;
+
+		// 戻り値用の変数、衝突した分割番号と衝突時の座標が返ってくる
+		int hitdivnum = 0;
+		Collision::CalulateDivisionToHit_RotateBox_Sphere(ColA_Box, OldRotation, 0, divnum, oneValue, ColSphere->GetSphere(), &hitdivnum);
+
+		for (int i = 0; i < 5; i++)
+		{
+			Vec3 BeforColRot = OldRotation + (hitdivnum - (i * 10)) * oneValue;
+
+			// 衝突寸前にゲームオブジェクトを戻して、子供に空のオブジェクトを付ける。
+			ColA_Box->GetParentGameObject()->SetRotation(BeforColRot);
+
+			GameData* gamedata = ManagerManager::GetGameData();
+			EmptyObject* p_EmptyObject = gamedata->GameObjectListData.AddGameObject<EmptyObject>();
+			p_EmptyObject->SetPosition(ColSphere->GetSphere()->center);
+			ColA_Box->GetParentGameObject()->AddChild(p_EmptyObject);
+
+			// 衝突を無視して時間を進めた場合の場所に戻す。
+			ColA_Box->GetParentGameObject()->SetRotation(Rotation);
+			// 仮の子供で座標の更新をさせる。
+			p_EmptyObject->ParentChildCalculate();
+
+			// プレイヤー(Sphere)の座標を仮の子供と同じ場所にセットする
+			ColB_Sphere->GetParentGameObject()->SetPosition(p_EmptyObject->GetPosition());
+			ColSphere->GetSphere()->setPos(p_EmptyObject->GetPosition());
+
+			// 仮のオブジェクトを消す
+			p_EmptyObject->SetDestroy();
+
+			Sphere	t_sphere{ ColB_Sphere->GetParentGameObject()->GetPosition(), PlayerRadius };
+
+			// 衝突してなかったら終わり
+			if (!ColBox->GetOrientedBox()->intersects(t_sphere))
+			{
+				return true;
+			}
+		}
+
+	}
+
+	return false;
+}
 
 
 
@@ -460,7 +535,7 @@ bool CreateRaysandCheckCP(const Array<int>* verArray, const int& verA, const int
 
 			// 長さが辺の長さより大きかったら終了
 			intersectsDistanceA = ray.intersects(*sphere);
-			if (intersectsDistanceA != none)
+			if (intersectsDistanceA.has_value())
 			{
 				if (pow(intersectsDistanceA.value(), 2) > distance.lengthSq())
 					return false;
@@ -468,7 +543,7 @@ bool CreateRaysandCheckCP(const Array<int>* verArray, const int& verA, const int
 
 		}
 		// もし衝突していたら、逆からもレイをとばす
-		if (intersectsPtA != none)
+		if (intersectsPtA.has_value())
 		{
 
 			Float3 distance = surfaces->m_Corners[verA] - surfaces->m_Corners[verB];
@@ -477,13 +552,13 @@ bool CreateRaysandCheckCP(const Array<int>* verArray, const int& verA, const int
 
 			// 長さが辺の長さより大きかったら終了
 			intersectsDistanceB = ray.intersects(*sphere);
-			if (intersectsDistanceB != none)
+			if (intersectsDistanceB.has_value())
 			{
 				if (pow(intersectsDistanceB.value(), 2) > distance.lengthSq())
 					return false;
 			}
 			// 近すぎると誤差で衝突が取れない場合がある。
-			if (intersectsPtB == none)
+			if (!intersectsPtB.has_value())
 			{
 				// その場合角で判定をとる
 				*ret_cp = (intersectsPtA.value() + surfaces->m_Corners[verB]) * 0.5;
@@ -491,9 +566,12 @@ bool CreateRaysandCheckCP(const Array<int>* verArray, const int& verA, const int
 					int ffff = 4;
 				return true;
 			}
-			// そのふたつのれいの衝突点のど真ん中が最接近点となる
-			*ret_cp = (intersectsPtA.value() + intersectsPtB.value()) * 0.5;
-			return true;
+			else
+			{
+				// そのふたつのれいの衝突点のど真ん中が最接近点となる
+				*ret_cp = (intersectsPtA.value() + intersectsPtB.value()) * 0.5;
+				return true;
+			}
 		}
 	}
 	return false;
@@ -574,7 +652,7 @@ void Sphere_HitOneSurface(const Sphere* sphere, const OrientedBoxSurfaces* surfa
 	int* hitnum = hit->data();
 
 	// surface側の最接近点
-	Optional<Float3> cp_surface{};
+	Optional<Float3> cp_surface;
 
 	// 球の真ん中からその面の-法線にレイをとばして衝突点が最接近点となる。
 	// ただし、球の移動が速かったり小さかったりした場合真ん中が壁の中に埋まってる可能性があるため、レイの開始位置を
@@ -586,11 +664,15 @@ void Sphere_HitOneSurface(const Sphere* sphere, const OrientedBoxSurfaces* surfa
 	Ray ray{ rayCenter,rayDirection };
 
 	cp_surface = ray.intersectsAt(surfaces->m_Surfaces[hitnum[0]]);
-	if (!cp_surface.has_value())
+	if (cp_surface.has_value())
+	{
+		// 最接近点を返す
+		*ret_cp = cp_surface.value();
+	}
+	else
+	{
 		*ret_cp = sphere->center + rayDirection * sphere->r;
-
-	// 最接近点を返す
-	*ret_cp = cp_surface.value();
+	}
 
 	// 理論上レイが当たらないことはない。
 }
@@ -874,7 +956,7 @@ void Sphere_Box_GetHitSurfaceNormal(Sphere* sphere, const OrientedBox* box, Arra
 	}
 
 	*ret_hitnum = hit.size();
-	Print << U"size: {}"_fmt(hit.size());
+	//Print << U"size: {}"_fmt(hit.size());
 	return;
 
 
@@ -923,5 +1005,55 @@ void CalulateDivisionToHit_Sphere_Box(const Vec3& oldpos, int divmin, int divmax
 			return;
 		}
 		CalulateDivisionToHit_Sphere_Box(oldpos, divmin, divmax, oneValue, sphere, box, ret_hitdivnum, ret_hitpos);
+	}
+}
+
+
+// 衝突した瞬間を求めるために再起させる関数。divmin,divmax は更新されていくのでconstを付けない。
+void Collision::CalulateDivisionToHit_RotateBox_Sphere(Collision* BaseBoxCol, const Vec3& oldrotate, int divmin, int divmax, const Vec3& oneValue, const Sphere* sphere, int* ret_hitdivnum)
+{
+	// 0チェックのため
+	if (divmax - divmin == 0)
+		return;
+	// 現在計算中の値は真ん中の値となる
+	int nowdiv = (divmin + divmax) / 2;
+
+	Vec3 NewRotate = oldrotate + (oneValue * nowdiv);
+
+	OrientedBox NowBox;
+	NowBox.setPos(BaseBoxCol->GetPosition());
+	Quaternion Qua = Quaternion::Identity();
+	Quaternion rQua = Quaternion::Identity();
+	rQua =  Qua.RollPitchYaw<double, double, double>(NewRotate.x, NewRotate.y, NewRotate.z);
+	NowBox.setOrientation(rQua);
+	NowBox.setSize(BaseBoxCol->GetSize());
+
+	if (NowBox.intersects(*sphere))
+	{
+		// hitした場合、このdivnumより値が小さいところにあるので手前半分にする
+		int olddivmax = divmax;
+		divmax = nowdiv;
+
+		// 値が変わっていなかったりしたら終了
+		if (divmax <= divmin || divmax == olddivmax)
+		{
+			*ret_hitdivnum = nowdiv - 1;
+			return;
+		}
+		CalulateDivisionToHit_RotateBox_Sphere(BaseBoxCol, oldrotate, divmin, divmax, oneValue, sphere, ret_hitdivnum);
+	}
+	else
+	{
+		// hitしなかった場合、このdivnumより値が大きいところにあるので奥の半分にする
+		int olddivmin = divmin;
+		divmin = nowdiv;
+
+		// 値が変わっていなかったりしたら終了
+		if (divmin >= divmax || divmin == olddivmin)
+		{
+			*ret_hitdivnum = nowdiv;
+			return;
+		}
+		CalulateDivisionToHit_RotateBox_Sphere(BaseBoxCol, oldrotate, divmin, divmax, oneValue, sphere, ret_hitdivnum);
 	}
 }

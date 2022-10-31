@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+static const float ForcusOffsetY = 1.0f;
 
 struct FPSCamera
 {
 
-	double angleX = 90_deg;
+	double angleX = 180_deg;	// xが右に正、zが前に正
 	double angleYvalue = 0.0;
 	float sensitivity = 1.0f;
 

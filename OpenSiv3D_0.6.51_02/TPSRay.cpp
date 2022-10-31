@@ -16,6 +16,8 @@ Sphere		   TPSRay::m_RaySphere = Sphere{ Vec3(0,0,0), 0.3 };
 Optional<Vec3> TPSRay::m_intersectsAt;
 GameObject*	   TPSRay::m_HitGameObject;
 Vec3		   TPSRay::m_HitNormal;
+float		   TPSRay::m_Radius = 40.0f;
+
 
 
 void TPSRay::RayInit()
@@ -31,6 +33,10 @@ void TPSRay::RayUpdate()
 	// リセット
 	m_intersectsAt.reset();
 	m_HitGameObject = nullptr;
+
+	// -nanになっていたらりたーん
+	if (m_Ray.direction.hasNaN() || m_Ray.origin.hasNaN())
+		return;
 
 	// レイを作る
 	/*const Ray ForGetDirectRay = m_Camera.screenToRay(Scene::Center());
@@ -51,8 +57,18 @@ void TPSRay::RayUpdate()
 		if (gamobj->GetName() == U"Player")
 			continue;
 
-		if (gamobj->GetName() == U"KnifeBlock")
+		if (gamobj->GetName() == U"GoalObject")
 			continue;
+
+		/*if (gamobj->GetName() == U"KnifeBlock")
+			continue;*/
+
+		// 赤いブロックだったら当たらない処理。あってもなくてもいいかも。悩みどころ
+		//if (gamobj->GetName() == U"KnifeBlock")
+		//{
+		//	if (gamobj->GetCollisionComponent()->GetColor() == KnifeBlock_HighlightColor)
+		//		continue;
+		//}
 
 		for (auto comp : gamobj->GetComponentList())
 		{
@@ -130,6 +146,7 @@ void TPSRay::RayUpdate()
 	}
 	else
 	{
+		// 衝突していなかったら
 		Vec3 spherepos = m_Ray.getOrigin() + m_Ray.getDirection() * 10;
 		m_RaySphere.setPos(spherepos);
 	}
@@ -140,7 +157,7 @@ void TPSRay::RayUpdate()
 
 void TPSRay::RayDraw()
 {
-	Cylinder rayLine{ m_Ray.getOrigin(), m_Ray.getOrigin() + m_Ray.getDirection() * 100, 0.1 };
-	rayLine.draw(Linear::Palette::Gray);
-	m_RaySphere.draw(Linear::Palette::Red);
+	//Cylinder rayLine{ m_Ray.getOrigin(), m_Ray.getOrigin() + m_Ray.getDirection() * 100, 0.1 };
+	//rayLine.draw(Linear::Palette::Gray);
+	//m_RaySphere.draw(Linear::Palette::Red);
 }

@@ -27,7 +27,6 @@ void CalulateDivisionToHit_Sphere_Box(const Vec3& oldpos, int divmin, int divmax
 
 
 
-
 // もつことのできるコリジョンの種類
 enum class CollisionType
 {
@@ -65,6 +64,7 @@ private:
 
 	// コリジョンの可視性
 	bool		m_Visibility = true;
+	float		m_Alfa = 1.0f;			// コリジョンの形の透明度
 	ColorF		m_ColorF = Linear::Palette::Aqua;
 
 	// Blockの時、true:衝突したところで止まる。	false:壁ずりさせる
@@ -109,6 +109,11 @@ protected:
 
 	// 1フレーム前の値
 	Vec3	m_OldPosition = Vec3(0, 0, 0);
+	Vec3	m_OldRotation = Vec3(0, 0, 0);
+
+	// 1フレーム前の値からの変化量
+	Vec3	m_DeltaPosition = Vec3(0, 0, 0);
+	Vec3	m_DeltaRotation = Vec3(0, 0, 0);
 
 
 
@@ -116,6 +121,9 @@ public:
 
 	// 親クラスのコンストラクタをやってくれる。
 	using Component::Component;
+
+	void SetVisibility(bool visibility) { m_Visibility = visibility; }
+	bool GetVisibility() { return m_Visibility; }
 
 	void SetOffsetPosition(Vec3 position) { m_OffsetPosition = position; }
 	void SetOffsetRotation(Vec3 rotation)
@@ -129,6 +137,7 @@ public:
 	void SetOffsetSize(Vec2 size) { m_OffsetSize.x = size.x; m_OffsetSize.y = size.y; m_OffsetSize.z = size.x; }
 	void SetOffsetSize(float size) { m_OffsetSize.x = size; m_OffsetSize.y = size, m_OffsetSize.z = size;}
 	Vec3 GetPosition() { return m_Position; }
+	void SetPosition(Vec3 pos) { m_Position = pos; }
 	Vec3 GetRotation() { return m_Rotation; }
 	Quaternion GetQuaternion() { return m_Quaternion; }
 	Vec3 GetSize() { return m_Size; }
@@ -137,6 +146,10 @@ public:
 	bool GetHittoStop() { return m_HittoStop; }
 
 	Vec3 GetOldPosition() { return m_OldPosition; }
+	Vec3 GetOldRotation() { return m_OldRotation; }
+
+	Vec3 GetDeltaPosition() { return m_DeltaPosition; }
+	Vec3 GetDeltaRotation() { return m_DeltaRotation; }
 
 	CollisionType GetCollisionType() { return m_CollisionType; }
 	void SetCollisionType(CollisionType CollisionType) { m_CollisionType = CollisionType; }
@@ -158,6 +171,9 @@ public:
 	ColorF GetColor() { return m_ColorF; }
 	void SetCollisionColor(ColorF colorF) { m_ColorF = colorF; }
 
+	float GetAlfa() { return m_Alfa; }
+	void SetAlfa(float alfa) { m_Alfa = alfa; }
+
 	virtual void Init() override
 	{
 		Component::Init();
@@ -178,7 +194,7 @@ public:
 
 	virtual void Draw() override
 	{
-		Component::Draw();
+		//Component::Draw();
 	}
 
 	virtual void UpdateCollisionState();
@@ -213,9 +229,11 @@ public:
 
 	// Block
 	bool SphereBoxBlock(Collision* ColA_Sphere, Collision* ColB_Box);
+	bool BoxSphereBlock_Rotation(Collision* ColB_Box, Collision* ColA_Sphere);
 
 
 
+	static void CalulateDivisionToHit_RotateBox_Sphere(Collision* BaseBoxCol, const Vec3& oldrotate, int divmin, int divmax, const Vec3& oneValue, const Sphere* sphere, int* ret_hitdivnum);
 
 
 	Quaternion GetQuaternionForRotation()

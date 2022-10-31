@@ -72,7 +72,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableSpecificWarnings>26451;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -98,7 +98,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DisableSpecificWarnings>26451;26812;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
@@ -119,19 +119,25 @@
     <ClCompile Include="Collision_Sphere.cpp" />
     <ClCompile Include="Collision_Sub.cpp" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GoalObject.cpp" />
     <ClCompile Include="KnifeBlock.cpp" />
     <ClCompile Include="KnifeBullet.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ManagerManager.cpp" />
+    <ClCompile Include="MidObject.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SkyRender.cpp" />
+    <ClCompile Include="StagePlacedBlockList.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="TPSRay.cpp" />
+    <ClCompile Include="UIEffectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="App\engine\texture\box-shadow\128.png" />
@@ -334,17 +340,25 @@
     <ClInclude Include="Collision_Sub.h" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="EffectManager.h" />
+    <ClInclude Include="EmptyObject.h" />
     <ClInclude Include="FPSCamera.h" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GD_GameObjectListData.h" />
+    <ClInclude Include="GoalObject.h" />
     <ClInclude Include="KnifeBlock.h" />
     <ClInclude Include="KnifeBullet.h" />
     <ClInclude Include="ManagerManager.h" />
+    <ClInclude Include="MidObject.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SkyRender.h" />
+    <ClInclude Include="StagePlacedBlockList.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Title.hpp" />
     <ClInclude Include="TPSRay.h" />
+    <ClInclude Include="UIEffect.h" />
+    <ClInclude Include="UIEffectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">

@@ -5,6 +5,7 @@ class Collision_Box : public Collision
 {
 private:
 	OrientedBox m_OrientedBox;
+	OrientedBox m_OldOrientedBox;
 
 public:
 
@@ -12,6 +13,7 @@ public:
 	using Collision::Collision;
 
 	OrientedBox* GetOrientedBox() { return &m_OrientedBox; }
+	OrientedBox* GetOldOrientedBox() { return &m_OldOrientedBox; }
 
 	void Init() override
 	{
@@ -36,13 +38,9 @@ public:
 	void Update() override;
 
 
-	void Draw() override
-	{
-		// 親
-		Collision::Draw();
-
-		m_OrientedBox.draw(GetColor());
-	}
+	void Draw() override;
+	// 縁取りの描写
+	void DrawHemming(const OrientedBox* orientedbox);
 
 	void UpdateCollisionState() override;
 

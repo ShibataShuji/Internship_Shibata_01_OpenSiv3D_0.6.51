@@ -21,6 +21,8 @@ private:
 	static GameObject*	  m_HitGameObject;
 	static Vec3			  m_HitNormal;
 
+	static float		  m_Radius;	// カメラの球の半径
+
 	//static Ray			  m_Ray{ Vec3(0,0,0), Vec3(1,0,0) };
 	//static Sphere		  m_RaySphere{ Vec3(0,0,0), 0.3 };
 
@@ -44,6 +46,6 @@ public:
 	static Optional<Vec3>* GetintersectsAt() { return &m_intersectsAt; }
 	static GameObject* GetHitGameObject() { return m_HitGameObject; }
 	static Vec3* GetHitNormal() { return &m_HitNormal; }
-
+	static float& GetRadius() { return m_Radius; }
 
 };

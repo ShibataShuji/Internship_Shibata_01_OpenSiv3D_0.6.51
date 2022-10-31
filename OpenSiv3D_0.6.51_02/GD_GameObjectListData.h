@@ -7,13 +7,24 @@ struct GD_GameObjectListData
 	Array<GameObject*> GameObjectList;
 	int				   UpdateObjectNum;
 
-	void UpdateGameObjectList()
+	// ignorePlayerがtrueで、プレイヤーとプレイヤーの発射した弾は更新されないようになる
+	void UpdateGameObjectList(bool ignorePlayer = false)
 	{
 		if (!GameObjectList.empty())
 		{
+
 			// このフレームでの初期化
 			for (auto& GameObject : GameObjectList)
 			{
+				if (ignorePlayer)
+				{
+					if (GameObject->GetName() == U"Player")
+						continue;
+
+					if(GameObject->GetCreatedMe() != nullptr)
+						if (GameObject->GetCreatedMe()->GetName() == U"Player")
+							continue;
+				}
 				// 全てアップデートが１回もされてない状態に戻す
 				GameObject->SetUpdateOnece(false);
 			}
@@ -22,7 +33,19 @@ struct GD_GameObjectListData
 			UpdateObjectNum = GameObjectList.size();
 			for (int i = 0; i < UpdateObjectNum; i++)
 			{
+
 				auto& GameObject = GameObjectList[i];
+
+				if (ignorePlayer)
+				{
+					if (GameObject->GetName() == U"Player")
+						continue;
+
+					if (GameObject->GetCreatedMe() != nullptr)
+						if (GameObject->GetCreatedMe()->GetName() == U"Player")
+							continue;
+				}
+
 				if(GameObject->UpdateOnceCheck())		// このフレームでのアップデートが1回目なら行う
 					GameObject->Update();
 			}
@@ -34,6 +57,11 @@ struct GD_GameObjectListData
 				count++;
 			}*/
 		}
+
+		// デストロイの予約がされている場合リストから排除する。
+		// また、Destroy関数の中で、deleteもしてあげる。
+		GameObjectList.remove_if([](GameObject* object) {return object->Destroy(); });		// ラムダ式
+
 	}
 
 	void DrawGameObjectList()
@@ -63,5 +91,26 @@ struct GD_GameObjectListData
 		return GameObjectList;
 	}
 
+	// 全てのゲームオブジェクトをデリーとする
+	void DelteAllGameObjectList()
+	{
+		for (auto& GameObject : GameObjectList)
+		{
+			GameObject->SetDestroy();
+		}
+		GameObjectList.remove_if([](GameObject* object) {return object->Destroy(); });		// ラムダ式
+	}
+
+	// プレイヤーとゴールオブジェクト以外をデリートする
+	void DelteAllGameObjectList_IgnorePlayerandGoal()
+	{
+		for (auto& GameObject : GameObjectList)
+		{
+			if (GameObject->GetName() == U"Player" || GameObject->GetName() == U"GoalObject")
+				continue;
+			GameObject->SetDestroy();
+		}
+		GameObjectList.remove_if([](GameObject* object) {return object->Destroy(); });		// ラムダ式
+	}
 
 };

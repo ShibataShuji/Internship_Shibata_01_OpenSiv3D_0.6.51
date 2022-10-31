@@ -13,7 +13,15 @@ enum class State
 struct GameData
 {
 	GD_GameObjectListData GameObjectListData;
+	int16 Title_Step = 0;
 
+	int SelectStage = 0;
+	int SelectMid = 0;
+	bool itGoal = false;
+
+	bool DebugMode = false;
+
+	Stopwatch StopwatchData;
 };
 
 
